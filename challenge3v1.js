@@ -2,38 +2,47 @@
 // the formats so that if you enter HEX color 
 // format it returns RGB and if you enter RGB color format it returns HEX.
 
+//cluttered version also detects only strings
+const convertColor = inputCode=>{
 
-//cleaner version
-const convertCode = (in1,in2,in3)=>{
-	if(typeof in1==='string'){
-		return hexToRGB(in1);
+	let codeType = detectCode(inputCode);
+	let conversionType = '';
+	let conversion;
+	let colCode=inputCode;
+
+	if(codeType ==='hex'){
+		conversionType = 'RGB';
+		colCode = colCode.charAt(0)==='#' ? colCode.substring(1,7) : colCode.substring(0,6);
+		let rgbCode ={
+			r:parseInt(colCode.substring(0,2), 16),
+			g:parseInt(colCode.substring(2,4), 16),
+			b:parseInt(colCode.substring(4,6), 16),
+		};
+		
+		conversion =`rgb(${rgbCode.r},${rgbCode.g},${rgbCode.b})`;
+	}else if(codeType ==='rgb'){
+		conversionType = 'HEX';
+		let hexCode = colCode.split(',',3);
+		hexCode.forEach((item,i)=>{
+			let hex = parseInt(item).toString(16)
+			hexCode[i] = hex.length===1 ? 0+hex : hex;
+		});
+		conversion =`#${hexCode[0]}${hexCode[1]}${hexCode[2]}`;
+	}
+
+	console.log(`Code entered ${inputCode}, detected '${codeType} ${codeType==='hex'?'#':''}${colCode}' coverting to '${conversionType}' = ${conversion} `);
+}
+
+const detectCode = colorCode =>{
+	if(colorCode.charAt(0)==='#'){
+		return 'hex';
 	}else{
-		return rgbToHex(in1,in2,in3);
+		return 'rgb';
 	}
 };
 
-const hexToRGB = hex=>{
-	let intro = `Converting HEX ${hex}`
-	hex = hex.replace('#','');
-	let rgbCode ={
-		r:parseInt(hex.substring(0,2), 16),
-		g:parseInt(hex.substring(2,4), 16),
-		b:parseInt(hex.substring(4,6), 16),
-	};	
-	return (`${intro} to RGB(${rgbCode.r},${rgbCode.g},${rgbCode.b})`);
+convertColor('220,1,252');
+convertColor('#dc01fc');
 
-};
 
-const rgbToHex = (r,g,b)=>{
-	let intro = `Converting RGB(${r},${g},${b})`
-		r = r.toString(16);
-		r = r.length===1 ? 0+r : r;
-		g = g.toString(16);
-		g = g.length===1 ? 0+g : g;
-		b = b.toString(16);
-		b = b.length===1 ? 0+b : b;
-		return (`${intro} to HEX #${r}${g}${b}`);
-};
 
-console.log(convertCode(220,1,252));
-console.log(convertCode('#dc01fc'));
